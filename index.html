@@ -522,6 +522,95 @@ body {
   font-size: 12px; padding: 4px 0;
 }
 
+/* ── FLOATING ACTION BUTTON (FAB) ───────────────────────── */
+.fab-wrap {
+  position: fixed;
+  right: 24px;
+  bottom: 32px;
+  z-index: 140;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.fab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #0F9D58;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 13px 20px 13px 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(15,157,88,.45);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .25s cubic-bezier(.175,.885,.32,1.275);
+  white-space: nowrap;
+  animation: fabBounceIn .6s cubic-bezier(.175,.885,.32,1.275) .4s both;
+}
+.fab:hover {
+  background: #0B7A45;
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 8px 28px rgba(15,157,88,.55);
+}
+.fab:active {
+  transform: scale(.96);
+}
+.fab-icon {
+  width: 28px;
+  height: 28px;
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+.fab-label { line-height: 1.2; }
+.fab-label span {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  opacity: .85;
+  margin-top: 1px;
+}
+/* Pulse ring */
+.fab::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50px;
+  border: 2px solid rgba(15,157,88,.4);
+  animation: fabPulse 2.2s ease-out 1.2s infinite;
+}
+@keyframes fabBounceIn {
+  from { opacity:0; transform: scale(.5) translateY(20px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+@keyframes fabPulse {
+  0%   { transform: scale(1);   opacity: .7; }
+  70%  { transform: scale(1.18); opacity: 0; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+/* Mobile: lebih kecil, di atas bottom nav */
+@media (max-width: 768px) {
+  .fab-wrap {
+    right: 14px;
+    bottom: 78px;
+  }
+  .fab {
+    padding: 11px 16px 11px 12px;
+    font-size: 13px;
+    border-radius: 50px;
+  }
+  .fab-icon { width: 26px; height: 26px; font-size: 14px; }
+}
+
 /* ── CERTIFICATE ─────────────────────────────────────────── */
 .cert-box {
   border: 3px solid var(--navy); border-radius: 16px;
@@ -865,6 +954,29 @@ body {
     <div class="di-text"><span class="di-label">Uji Pemahaman</span><span class="di-desc">Kuis 10 soal + sertifikat</span></div>
     <span class="di-arrow">›</span>
   </button>
+</div>
+
+<!-- ══ FLOATING ACTION BUTTON — Buka SIPORSI Google Sheets ══════════════════ -->
+<div class="fab-wrap" id="fab-wrap">
+  <a href="https://docs.google.com/spreadsheets/d/1E-XzVWBGCRUmJx0BAbJUoaqdQ2G1T2bQAlg5YrRz1CE/edit?gid=1769921993#gid=1769921993"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="fab"
+     title="Buka sistem SIPORSI di Google Sheets"
+     onclick="this.style.transform='scale(.94)'">
+    <div class="fab-icon">
+      <!-- Google Sheets icon SVG -->
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="4" fill="#0F9D58"/>
+        <path d="M7 8h10M7 12h10M7 16h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <rect x="14" y="13" width="5" height="5" rx="1" fill="white" opacity=".9"/>
+      </svg>
+    </div>
+    <div class="fab-label">
+      Buka SIPORSI
+      <span>Google Sheets →</span>
+    </div>
+  </a>
 </div>
 
 <!-- ══ BOTTOM NAV (mobile) ══════════════════════════════════════════════════ -->
@@ -2269,6 +2381,28 @@ renderQ();
   var _origShowPage = showPage;
   // Patch showPage to re-trigger animation when returning home
   window._heroAnimDone = false;
+})();
+
+// ── FAB SCROLL BEHAVIOUR ──────────────────────────────────
+(function(){
+  var lastY = 0;
+  var fab   = document.getElementById('fab-wrap');
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY;
+    if (!fab) return;
+    // Hide saat scroll naik cepat, show saat scroll turun atau di bawah
+    if (y < lastY - 10 && y > 200) {
+      fab.style.opacity = '0';
+      fab.style.pointerEvents = 'none';
+      fab.style.transform = 'translateY(16px)';
+    } else {
+      fab.style.opacity = '1';
+      fab.style.pointerEvents = 'auto';
+      fab.style.transform = 'translateY(0)';
+    }
+    fab.style.transition = 'opacity .3s ease, transform .3s ease';
+    lastY = y;
+  }, { passive: true });
 })();
 
 // ── TOUCH / SWIPE SUPPORT ─────────────────────────────────
